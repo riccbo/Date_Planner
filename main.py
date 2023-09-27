@@ -5,6 +5,7 @@ import time
 """
 I want to easily add new categories without having to hard code them. I want to be efficient with space and time. Space and time are not that important to make it work. Maybe later.
 I may need to make all categories into bool attributes of the class activity but that would mean I would have to hard code it.
+Turn all categories to enums but the ones that are not booleans. For example cost should be a seperate attribute.
 """
 
 class category(Enum):
@@ -14,17 +15,6 @@ class category(Enum):
     COOKING = auto()
     LAZY = auto()
     LOTS_OF_MOVEMENT = auto()
-
-# MAYBE USE STRINGS AS VALUES FOR CATEGORIES
-# categories = [
-#     "restaurant",
-#     "food",
-#     "creative",
-#     "cooking/baking",
-#     "lazy",
-#     "lots of movement",
-#     "chill",
-# ]
 
 class temp(Enum):
     WINTER = "winter"
@@ -130,4 +120,6 @@ def filter1(activities, attribute_name) -> []:
     return filtered_activities
 
 print_activities(filter1(all_activities, "indoor"))
+
+# TODO maybe create a function that lets you create a new activity. All of this means that the activities have to be saved as a JSON
 
