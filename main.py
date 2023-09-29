@@ -1,5 +1,5 @@
 from enum import Enum, auto
-import time
+import time, json
 
 
 """
@@ -7,7 +7,7 @@ I want to easily add new categories without having to hard code them. I want to 
 I may need to make all categories into bool attributes of the class activity but that would mean I would have to hard code it.
 Turn all categories to enums but the ones that are not booleans. For example cost should be a seperate attribute.
 """
-
+# CLASSES
 class category(Enum):
     RESTAURANT = auto()
     FOOD = auto()
@@ -15,12 +15,14 @@ class category(Enum):
     COOKING = auto()
     LAZY = auto()
     LOTS_OF_MOVEMENT = auto()
+    WINTER = auto()
+    SUMMER = auto()
+    FALL = auto()
+    SPRING = auto()
+    INDOOR = auto()
+    OUTDOOR = auto()
+    HOME = auto()
 
-class temp(Enum):
-    WINTER = "winter"
-    SUMMER = "summer"
-    FALL = "fall"
-    SPRING = "spring"
 
 class activity:
     """Class that describes an activity"""
@@ -28,46 +30,70 @@ class activity:
     def __str__(self) -> str:
         return self.name
 
-    def __init__(self, name, indoor, home, time_cost_max, time_cost_min, money_cost, categories, temp) -> None:
+    def __init__(self, name, time_cost, money_cost, categories) -> None:
         self.name = name
-        self.indoor = indoor
-        self.home = home
-        self.time_cost_max = time_cost_max
-        self.time_cost_min = time_cost_min
+        self.time_cost = time_cost
         self.money_cost = money_cost
         self.categories = categories
-        self.temp = temp
-        # self.opening_hours = opening_hours
+
     name = ""
-    indoor = False
-    home = False
-    time_cost_max = 0.0
-    time_cost_min = 0.0
+
+    time_cost = [0.0, 0.0]
     money_cost = 0.0
-    categories = []
-    temp = []
     # num_people = 0
     # opening_hours = None
+
+    categories = []
+
+# FUNCTIONS
+
+def get_data():
+    with open('Date_Planner\data.json', 'r') as file:
+        json_data = json.load(file)
+
+    data_as_dict = []
+
+    for json_string in json_data:
+        dict = json.loads(json_string)
+        data_as_dict.append(dict)
+
+    for item in data_as_dict:
+        # for loop for categories
+        activity = activity(name=item["name"], time_cost=item["time_cost"], money_cost=item["money_cost"], categories=item["categories"])
+        all_activities.append(activity)
+    print("Data retrieved!")
+
+def save_data():
+    json_strings = []
+
+    for activity in all_activities:
+        json_string = json.dumps(activity.__dict__)
+        print(json_string)
+        json_strings.append(json_string)
+
+    with open("Date_Planner\data.json", "w") as file:
+        json.dump(json_strings, file, indent=4)
+    print("Successfully saved data!")
 
 
 # ACTIVITIES
 
 """Creating the activities with their attributes and adding them to a list of all activities"""
 
-all_activities = []
+all_activities = [] #h global list of all activities
 
-t = time.process_time()
+# Get all the activities from JSON file
 
-Kino = activity(name="kino", indoor=False, home=False, time_cost_max=4, time_cost_min=3, money_cost=20.0, categories=[category.LAZY], temp=[temp.FALL, temp.SPRING, temp.SUMMER, temp.WINTER])
-all_activities.append(Kino)
 
-Lasertag = activity(name="lasertag", indoor=True, home=False, time_cost_max=24.0, time_cost_min=1.0, money_cost=0.0, categories=[category.LOTS_OF_MOVEMENT], temp=[temp.FALL, temp.SPRING, temp.SUMMER, temp.WINTER])
-all_activities.append(Lasertag)
 
-Tretboot = activity(name="tretboot", indoor=False, home=False, time_cost_max=4.0, time_cost_min=1.0, money_cost=12.0, categories=[category.LOTS_OF_MOVEMENT], temp=[temp.SPRING, temp.SUMMER])
-all_activities.append(Tretboot)
+# Kino = activity(name="kino", time_cost=4, money_cost=0.0, categories=[])
+# all_activities.append(Kino)
 
-elapsed_time = time.process_time() - t
+# Lasertag = activity(name="lasertag", time_cost=24.0, money_cost=0.0, categories=[category.LOTS_OF_MOVEMENT])
+# all_activities.append(Lasertag)
+
+# Tretboot = activity(name="tretboot", time_cost=4.0, money_cost=12.0, categories=[category.LOTS_OF_MOVEMENT])
+# all_activities.append(Tretboot)
 
 
 # print out a list of all activities
@@ -84,42 +110,21 @@ Maybe just write a filter for every attribute, but this is horrible.
 Make a filter function for every type of attribute
 """
 
-# def filter_by_indoor(activities) -> []:
-#     filtered_activities = []
-#     for activity in all_activities:
-#         if(activity.indoor == True):
-#             filtered_activities.append(activity)
-#     return filtered_activities
+def filter1(activities, categories) -> []:
+    filtered_categories = []
+    for activity in activities:
+        has_all_categories = True
+        for category in categories:
+            if(category not in activity.categories):
+                has_all_categories = False
+        if has_all_categories:
+            filtered_categories.append(activity)
+    return filtered_categories
 
-def filter1(activities, attribute_name) -> []:
-    filtered_activities = []
-
-    if activities==None:
-        return []
-
-    type_of_attribute = type(getattr(activities[0], attribute_name))
-
-    if type_of_attribute is bool:
-        user_input = bool(input("Do you want the attribute to be [1]True or [0]False?\n"))
-        for activity in activities:
-            if(getattr(activity, attribute_name) ==  user_input):
-                filtered_activities.append(activity)
-    
-    elif type_of_attribute is float:
-        pass
-
-    elif type_of_attribute is category:
-        pass
-
-    elif type_of_attribute is temp:
-        pass
-
-
-    
-
-    return filtered_activities
-
-print_activities(filter1(all_activities, "indoor"))
 
 # TODO maybe create a function that lets you create a new activity. All of this means that the activities have to be saved as a JSON
+
+
+# save all activities to json
+
 
